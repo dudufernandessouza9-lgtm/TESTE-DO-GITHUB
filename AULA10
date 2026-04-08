@@ -1,0 +1,102 @@
+class Celular:
+    def __init__(self, id, nome, preco, estoque):
+        self.id = id
+        self.nome = nome
+        self.preco = preco
+        self.estoque = estoque
+
+    def __str__(self):
+        return f"ID: {self.id}, Nome: {self.nome}, Preço: R${self.preco:.2f}, Estoque: {self.estoque}"
+
+class SistemaVendas:
+    def __init__(self):
+        self.celulares = []
+        self.vendas = []
+        self._proximo_id_celular = 1
+        self._proximo_id_venda = 1
+
+    def adicionar_celular(self, nome, preco, estoque):
+        novo_celular = Celular(self._proximo_id_celular, nome, preco, estoque)
+        self.celulares.append(novo_celular)
+        self._proximo_id_celular += 1
+        print(f"Celular '{nome}' adicionado com sucesso!")
+
+    def listar_celulares(self):
+        if not self.celulares:
+            print("Nenhum celular cadastrado.")
+            return
+        print("\n--- Celulares Disponíveis ---")
+        for celular in self.celulares:
+            print(celular)
+        print("------------------------------")
+
+    def registrar_venda(self, id_celular, quantidade):
+        for celular in self.celulares:
+            if celular.id == id_celular:
+                if celular.estoque >= quantidade:
+                    valor_total = celular.preco * quantidade
+                    celular.estoque -= quantidade
+                    self.vendas.append({
+                        'id_venda': self._proximo_id_venda,
+                        'id_celular': id_celular,
+                        'nome_celular': celular.nome,
+                        'quantidade': quantidade,
+                        'valor_total': valor_total
+                    })
+                    self._proximo_id_venda += 1
+                    print(f"Venda registrada: {quantidade}x {celular.nome} por R${valor_total:.2f}")
+                    return True
+                else:
+                    print(f"Estoque insuficiente para {celular.nome}. Disponível: {celular.estoque}")
+                    return False
+        print("Celular não encontrado.")
+        return False
+
+    def listar_vendas(self):
+        if not self.vendas:
+            print("Nenhuma venda registrada.")
+            return
+        print("\n--- Histórico de Vendas ---")
+        for venda in self.vendas:
+            print(f"ID Venda: {venda['id_venda']}, Celular: {venda['nome_celular']}, Quantidade: {venda['quantidade']}, Total: R${venda['valor_total']:.2f}")
+        print("----------------------------")
+sistema = SistemaVendas()
+
+sistema.adicionar_celular("iPhone 15 Pro", 7999.00, 10)
+sistema.adicionar_celular("Samsung Galaxy S24 Ultra", 6999.00, 8)
+sistema.adicionar_celular("Xiaomi 14 Ultra", 5999.00, 12)
+while True:
+    print("\n--- Menu do Sistema de Vendas ---")
+    print("1. Listar Celulares")
+    print("2. Registrar Venda")
+    print("3. Listar Vendas")
+    print("4. Adicionar Novo Celular")
+    print("5. Sair")
+    
+    opcao = input("Escolha uma opção: ")
+
+    if opcao == '1':
+        sistema.listar_celulares()
+    elif opcao == '2':
+        sistema.listar_celulares()
+        try:
+            id_celular = int(input("Digite o ID do celular para venda: "))
+            quantidade = int(input("Digite a quantidade: "))
+            sistema.registrar_venda(id_celular, quantidade)
+        except ValueError:
+            print("Entrada inválida. Por favor, digite um número.")
+    elif opcao == '3':
+        sistema.listar_vendas()
+    elif opcao == '4':
+        try:
+            nome = input("Digite o nome do novo celular: ")
+            preco = float(input("Digite o preço do novo celular: "))
+            estoque = int(input("Digite o estoque inicial do novo celular: "))
+            sistema.adicionar_celular(nome, preco, estoque)
+        except ValueError:
+            print("Entrada inválida. Por favor, verifique o preço e o estoque.")
+    elif opcao == '5':
+        print("Saindo do sistema. Obrigado!")
+        break
+    else:
+        print("Opção inválida. Tente novamente.")
